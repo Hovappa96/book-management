@@ -4,9 +4,9 @@ const userModel = require("../models/userModel");
 const mongoose = require("mongoose")
 
 
-const type = function(value){
-    if(typeof value === "undefined" || value === null) return false
-    if(typeof value === "string" && value.trim().length === 0) return false
+const type = function (value) {
+    if (typeof value === "undefined" || value === null) return false
+    if (typeof value === "string" && value.trim().length === 0) return false
     return true
 }
 
@@ -56,19 +56,19 @@ const createBook = async function (req, res) {
             return res.status(400).send({ status: false, msg: "ISBN is already present" })
         }
 
-         const removespace = releasedAt.replace(/\s/g, '');
+        const removespace = releasedAt.replace(/\s/g, '');
 
         //date format validation
         if (!(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/.test(removespace))) {
             return res.status(400).send({ status: false, msg: "ReleasedAt is Not a valid Format" })
         }
-        data.releasedAt=removespace; //
+        data.releasedAt = removespace; //
 
 
         if ((ISBN.trim().length <= 12)) {
             return res.status(400).send({ status: false, msg: "Not a valid ISBN" })
         }
-    
+
         if (!(mongoose.Types.ObjectId.isValid(userId))) {
             return res.status(400).send({ status: false, msg: "Not a valid userId" })
         }
@@ -81,7 +81,7 @@ const createBook = async function (req, res) {
         if (data.userId !== IdofDecodedToken) {
             return res.status(401).send({ status: false, msg: "Unauthorized Access! User Does Not Matched" })
         }
-        
+
         let saveData = await bookModel.create(data)
         return res.status(201).send({ status: true, msg: "book is created", data: saveData })
 
@@ -104,7 +104,7 @@ const getBooks = async function (req, res) {
             return res.status(400).send({ status: false, msg: "No Parameter Passed in RequestBody" })
         }
 
-        let findBooks = await bookModel.find(data1).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 }).collation({locale:"en"}).sort({title:1})
+        let findBooks = await bookModel.find(data1).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 }).collation({ locale: "en" }).sort({ title: 1 })
 
         if (Object.keys(findBooks).length == 0) {
             return res.status(404).send({ status: false, msg: "No Books is Found" })
@@ -151,8 +151,8 @@ const updateBooks = async function (req, res) {
     try {
         let bookId = req.params.bookId;
         let data = req.body;
-        
-        let {title,ISBN,releasedAt,excerpt} = data
+
+        let { title, ISBN, releasedAt, excerpt } = data
         const IdofDecodedToken = req.userId
 
         if (Object.keys(data).length == 0) {
@@ -177,7 +177,7 @@ const updateBooks = async function (req, res) {
             return res.status(400).send({ status: false, msg: "releasedAt is mandatory, provide releasedAt" })
         }
 
-        
+
         //date format validation
         if (!(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/.test(releasedAt))) {
             return res.status(400).send({ status: false, msg: "ReleasedAt is Not a valid Format" })
@@ -185,7 +185,7 @@ const updateBooks = async function (req, res) {
         if ((ISBN.trim().length <= 12)) {
             return res.status(400).send({ status: false, msg: "Not a valid ISBN" })
         }
-        
+
         let findData = await bookModel.findById(bookId)
         if (!findData) {
             return res.status(404).send({ status: false, msg: "No book is Present" })
@@ -259,8 +259,5 @@ const deleteBooks = async function (req, res) {
     }
 }
 
-module.exports.createBook = createBook;
-module.exports.getBooks = getBooks;
-module.exports.getBooksById = getBooksById;
-module.exports.updateBooks = updateBooks;
-module.exports.deleteBooks = deleteBooks;
+
+module.exports = { createBook, getBooks, getBooksById, updateBooks, deleteBooks }

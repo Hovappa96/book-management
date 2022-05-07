@@ -2,9 +2,9 @@ const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 
-const type = function(value){
-    if(typeof value === "undefined" || value === null) return false
-    if(typeof value === "string" && value.trim().length === 0) return false
+const type = function (value) {
+    if (typeof value === "undefined" || value === null) return false
+    if (typeof value === "string" && value.trim().length === 0) return false
     return true
 }
 
@@ -16,15 +16,15 @@ const createUser = async function (req, res) {
         const { title, name, phone, email, password, address } = data
 
         //Mandatory validation
-        if (Object.keys(data) == 0 ) {
+        if (Object.keys(data) == 0) {
             return res.status(400).send({ status: false, msg: "No Parameter Passed" })
         }
         if (!type(title)) {
             return res.status(400).send({ status: false, msg: "No Title is Passed" })
-        } 
-        else{
-            let arr = ['Mr','Miss','Mrs']
-            if(!(arr.indexOf(title.trim()) !== -1)){
+        }
+        else {
+            let arr = ['Mr', 'Miss', 'Mrs']
+            if (!(arr.indexOf(title.trim()) !== -1)) {
                 return res.status(400).send({ status: false, msg: "Invalid enum Value" })
             }
         }
@@ -82,16 +82,16 @@ const userLogin = async function (req, res) {
         let data = req.body;
         let data1 = req.body.email;
         let data2 = req.body.password;
-        
+
         //mandatory validation
-        if(Object.keys(data) == 0){
+        if (Object.keys(data) == 0) {
             return res.status(400).send({ status: false, msg: "No Parameters Passed in requestBody" })
         }
         if (!type(data1)) {
-           return res.status(400).send({ status: false, msg: "email is required" })
+            return res.status(400).send({ status: false, msg: "email is required" })
         }
         if (!type(data2)) {
-           return res.status(400).send({ status: false, msg: "password is required" })
+            return res.status(400).send({ status: false, msg: "password is required" })
         }
 
         //format validaion
@@ -102,19 +102,19 @@ const userLogin = async function (req, res) {
         if (!(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-z\-0-9]+\.)+[a-z]{2,}))$/.test(data1.trim()))) {
             return res.status(400).send({ status: false, msg: "Please enter the credentials in lowercase" })
         }
-        
+
         if (!(data2.trim().length > 8 && data2.trim().length < 16)) {
             return res.status(400).send({ status: false, msg: "Invalid Password" })
         }
 
         let findUser = await userModel.findOne({ email: data1, password: data2 })
         if (!findUser) {
-           return res.status(400).send({ status: false, msg: "Invalid Credentials" })
+            return res.status(400).send({ status: false, msg: "Invalid Credentials" })
         } else {
             let geneToken = jwt.sign({
                 userId: findUser._id,
-            }, "group26",{expiresIn : "30m"});
-           return res.status(201).send({ status: true, msg: "token Created Successfully", Token: geneToken })
+            }, "group26", { expiresIn: "30m" });
+            return res.status(201).send({ status: true, msg: "token Created Successfully", Token: geneToken })
         }
     }
     catch (err) {
@@ -122,5 +122,5 @@ const userLogin = async function (req, res) {
     }
 }
 
-module.exports.createUser = createUser;
-module.exports.userLogin = userLogin;
+
+module.exports = { createUser, userLogin }
